@@ -1,295 +1,162 @@
+require('dotenv').config();
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const axios = require('axios');
-require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const PORT = process.env.API_GATEWAY_PORT || 3000;
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:3001';
+const WALLET_SERVICE_URL = process.env.WALLET_SERVICE_URL || 'http://localhost:3002';
+const TRANSACTION_SERVICE_URL = process.env.TRANSACTION_SERVICE_URL || 'http://localhost:3003';
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3004';
 
-// Middleware
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_EXPIRY = process.env.JWT_EXPIRY || '1h';
+
 app.use(cors());
-app.use(express.json());
+// app.use(express.json());
 
-// Service URLs
-const services = {
-  userService: process.env.USER_SERVICE_URL || 'http://localhost:3001',
-  walletService: process.env.WALLET_SERVICE_URL || 'http://localhost:3002',
-  transactionService: process.env.TRANSACTION_SERVICE_URL || 'http://localhost:3003',
-  notificationService: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3004'
-};
-
-// Dummy user database (in production, use real database)
-const users = [
-  {
-    id: 1,
-    username: 'admin',
-    email: 'admin@ewallet.com',
-    password: '$2a$10$YQi23oTwOhQz8D7YpWJRb.Cl.K.rBaxpXJ5.PN4xN8EYEKLc1K31m', // admin123
-    role: 'admin'
-  },
-  {
-    id: 2,
-    username: 'user1',
-    email: 'user1@ewallet.com',
-    password: '$2a$10$YQi23oTwOhQz8D7YpWJRb.Cl.K.rBaxpXJ5.PN4xN8EYEKLc1K31m', // admin123
-    role: 'user'
-  }
-];
-
-// JWT Authentication Middleware
-const authenticateJWT = (req, res, next) => {
+// JWT Token Verification Middleware
+const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Extract token from "Bearer TOKEN"
 
-  if (!authHeader) {
-    return res.status(401).json({ 
-      error: 'Access denied. No token provided.' 
-    });
+  if (token == null) {
+    return res.status(401).json({ success: false, message: 'Access denied. Token missing.' });
   }
 
-  const token = authHeader.split(' ')[1]; // Bearer TOKEN
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    console.log(`✓ JWT verified for user: ${decoded.username}`);
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ success: false, message: 'Invalid or expired token.' });
+    }
+    // Pass user info to downstream services
+    req.headers['x-user-id'] = user.userId;
+    req.headers['x-user-email'] = user.email;
     next();
-  } catch (error) {
-    console.error(`✗ JWT verification failed: ${error.message}`);
-    return res.status(403).json({ 
-      error: 'Invalid or expired token.' 
-    });
-  }
+  });
 };
 
-// Login endpoint
-app.post('/auth/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ 
-      error: 'Username and password are required' 
-    });
-  }
-
-  // Find user
-  const user = users.find(u => u.username === username);
-  
-  if (!user) {
-    return res.status(401).json({ 
-      error: 'Invalid credentials' 
-    });
-  }
-
-  // Verify password
-  const validPassword = await bcrypt.compare(password, user.password);
-  
-  if (!validPassword) {
-    return res.status(401).json({ 
-      error: 'Invalid credentials' 
-    });
-  }
-
-  // Generate JWT token
-  const token = jwt.sign(
-    { 
-      id: user.id, 
-      username: user.username,
-      email: user.email,
-      role: user.role 
-    },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-
-  res.json({
-    success: true,
-    token: token,
-    user: {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role
-    }
-  });
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', service: 'api-gateway' });
 });
 
-// Register endpoint
-app.post('/auth/register', async (req, res) => {
-  const { username, email, password } = req.body;
-
-  if (!username || !password || !email) {
-    return res.status(400).json({ 
-      error: 'Username, email and password are required' 
-    });
-  }
-
-  // Check if user already exists
-  const existingUser = users.find(u => u.username === username || u.email === email);
-  
-  if (existingUser) {
-    return res.status(400).json({ 
-      error: 'Username or email already exists' 
-    });
-  }
-
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // Create new user
-  const newUser = {
-    id: Math.max(...users.map(u => u.id), 0) + 1,
-    username,
-    email,
-    password: hashedPassword,
-    role: 'user'
+// Service health checks
+app.get('/health/services', async (req, res) => {
+  const services = {
+    'api-gateway': 'http://localhost:3000',
+    'user-service': 'http://localhost:3001',
+    'wallet-service': 'http://localhost:3002',
+    'transaction-service': 'http://localhost:3003',
+    'notification-service': 'http://localhost:3004'
   };
 
-  users.push(newUser);
-
-  // Generate token
-  const token = jwt.sign(
-    { 
-      id: newUser.id, 
-      username: newUser.username,
-      email: newUser.email,
-      role: newUser.role 
-    },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-
-  res.status(201).json({
-    success: true,
-    token: token,
-    user: {
-      id: newUser.id,
-      username: newUser.username,
-      email: newUser.email,
-      role: newUser.role
+  const statuses = {};
+  for (const [service, url] of Object.entries(services)) {
+    try {
+      const response = await fetch(`${url}/health`, { timeout: 2000 });
+      statuses[service] = response.ok ? 'UP' : 'DOWN';
+    } catch (error) {
+      statuses[service] = 'DOWN';
     }
-  });
+  }
+
+  res.json({ status: 'OK', services: statuses });
 });
 
-// Verify token endpoint
-app.get('/auth/verify', authenticateJWT, (req, res) => {
-  res.json({
-    success: true,
-    user: req.user
-  });
-});
-
-// Refresh token endpoint
-app.post('/auth/refresh', authenticateJWT, (req, res) => {
-  const newToken = jwt.sign(
-    { 
-      id: req.user.id, 
-      username: req.user.username,
-      email: req.user.email,
-      role: req.user.role 
-    },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-
-  res.json({
-    success: true,
-    token: newToken
-  });
-});
-
-// Proxy middleware with JWT forwarding
-const createAuthProxy = (service, serviceName) => {
-  return createProxyMiddleware({
-    target: services[service],
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      // Remove the /api/serviceName prefix and return just the namespace path
-      const prefix = `/api/${serviceName}`;
-      if (path.startsWith(prefix)) {
-        return path.slice(prefix.length) || '/';
-      }
-      return path;
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-      // Forward JWT token to backend services
-      if (req.user) {
-        proxyReq.setHeader('X-User-Id', req.user.id);
-        proxyReq.setHeader('X-User-Role', req.user.role);
-        proxyReq.setHeader('X-User-Username', req.user.username);
-        proxyReq.setHeader('X-User-Email', req.user.email);
-      }
-    },
-    onProxyRes: (proxyRes, req, res) => {
-      // Log proxy response for debugging
-      console.log(`✓ Proxy response: ${proxyRes.statusCode} from ${services[service]}`);
-    },
-    onError: (err, req, res) => {
-      console.error('✗ Proxy error:', err.message);
-      res.status(503).json({
-        error: 'Service unavailable',
-        message: err.message
-      });
-    }
-  });
+// Proxy configuration with timeouts
+const proxyOptions = {
+  timeout: 10000,
+  proxyTimeout: 10000
 };
 
-// Protected routes (require authentication)
-console.log('📝 Registering protected routes...');
-app.use('/api/user-service', authenticateJWT, createAuthProxy('userService', 'user-service'));
-console.log('  ✓ /api/user-service → ' + services.userService);
-app.use('/api/wallet-service', authenticateJWT, createAuthProxy('walletService', 'wallet-service'));
-console.log('  ✓ /api/wallet-service → ' + services.walletService);
-app.use('/api/transaction-service', authenticateJWT, createAuthProxy('transactionService', 'transaction-service'));
-console.log('  ✓ /api/transaction-service → ' + services.transactionService);
-app.use('/api/notification-service', authenticateJWT, createAuthProxy('notificationService', 'notification-service'));
-console.log('  ✓ /api/notification-service → ' + services.notificationService);
+// User Service - NO TOKEN REQUIRED (registration and login are public)
+app.use(
+  '/api/user-service',
+  createProxyMiddleware({
+    target: USER_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/user-service': ''
+    },
+    timeout: 10000,
+    proxyTimeout: 10000,
+    onError: (err, req, res) => {
+      console.error('User Service proxy error:', err.message);
+      res.status(503).json({ success: false, message: 'User Service unavailable' });
+    },
+    onProxyRes: (proxyRes, req, res) => {
+      proxyRes.headers['X-Proxy-By'] = 'api-gateway';
+    }
+  })
+);
 
-// Public routes (no authentication required)
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    gateway: 'E-Wallet API Gateway',
-    services: Object.keys(services).map(key => ({
-      name: key,
-      url: services[key]
-    }))
-  });
-});
+// Wallet Service - TOKEN REQUIRED
+app.use(
+  '/api/wallet-service',
+  verifyToken,
+  createProxyMiddleware({
+    target: WALLET_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/wallet-service': ''
+    },
+    timeout: 10000,
+    proxyTimeout: 10000,
+    onError: (err, req, res) => {
+      console.error('Wallet Service proxy error:', err.message);
+      res.status(503).json({ success: false, message: 'Wallet Service unavailable' });
+    }
+  })
+);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: 'Internal server error',
-    message: err.message
-  });
-});
+// Transaction Service - TOKEN REQUIRED
+app.use(
+  '/api/transaction-service',
+  verifyToken,
+  createProxyMiddleware({
+    target: TRANSACTION_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/transaction-service': ''
+    },
+    timeout: 15000,
+    proxyTimeout: 15000,
+    onError: (err, req, res) => {
+      console.error('Transaction Service proxy error:', err.message);
+      res.status(503).json({ success: false, message: 'Transaction Service unavailable' });
+    }
+  })
+);
 
-// 404 handler - catch all unmatched routes
+// Notification Service - TOKEN REQUIRED
+app.use(
+  '/api/notification-service',
+  verifyToken,
+  createProxyMiddleware({
+    target: NOTIFICATION_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/notification-service': ''
+    },
+    timeout: 10000,
+    proxyTimeout: 10000,
+    onError: (err, req, res) => {
+      console.error('Notification Service proxy error:', err.message);
+      res.status(503).json({ success: false, message: 'Notification Service unavailable' });
+    }
+  })
+);
+
+// 404 handler
 app.use((req, res) => {
-  console.error(`✗ 404: ${req.method} ${req.path}`);
-  res.status(404).json({
-    error: 'Not found',
-    path: req.path,
-    method: req.method,
-    message: 'The requested endpoint does not exist'
-  });
+  res.status(404).json({ success: false, message: 'Endpoint not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 API Gateway running on http://localhost:${PORT}`);
-  console.log(`📚 Login endpoint: POST http://localhost:${PORT}/auth/login`);
-  console.log(`📚 Register endpoint: POST http://localhost:${PORT}/auth/register`);
-  console.log(`🏥 Health check: GET http://localhost:${PORT}/health\n`);
-  console.log('Connected Services:');
-  Object.entries(services).forEach(([key, url]) => {
-    console.log(`  - ${key}: ${url}`);
-  });
-  console.log('\n');
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✓ API Gateway running on http://localhost:${PORT}`);
+  console.log(`✓ JWT authentication enabled for wallet, transaction, and notification services`);
+  console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✓ Service URLs loaded from environment variables`);
 });

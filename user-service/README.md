@@ -1,41 +1,26 @@
-# User Service - E-Wallet System
+# User Service
 
-User Service untuk mengelola data pengguna dalam sistem E-Wallet.
+Manages user registration, authentication, and user data.
 
-## Setup
+## Endpoints
 
-```bash
-pip install -r requirements.txt
-```
-
-## Configuration
-
-Buat file `.env` dengan konfigurasi:
-
-```env
-PORT=3001
-SECRET_KEY=user-service-secret-key
-DATABASE_URL=sqlite:///users.db
-SERVICE_NAME=user-service
-```
-
-## Menjalankan
-
-```bash
-python app.py
-```
-
-## API Endpoints
-
-### Users
-
+- `GET /health` - Health check
 - `GET /users` - Get all users
-- `GET /users/{id}` - Get user by ID
+- `GET /users/:id` - Get user by ID
 - `POST /users` - Create new user
-- `PUT /users/{id}` - Update user
-- `DELETE /users/{id}` - Delete user
+- `PUT /users/:id` - Update user
+- `DELETE /users/:id` - Delete user
+- `GET /internal/users/:id` - Internal endpoint for other services
 
-### Internal Endpoints
+## Database
 
-- `GET /internal/users/{user_id}` - Get user info (for other services)
-- `GET /internal/users/{user_id}/validate` - Validate user exists
+SQLite with `users` table containing:
+- id (INTEGER PRIMARY KEY)
+- name (TEXT)
+- email (TEXT UNIQUE)
+- password (TEXT)
+- created_at (DATETIME)
+
+## Port
+
+Runs on port 3001

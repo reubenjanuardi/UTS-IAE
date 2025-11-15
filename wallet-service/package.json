@@ -1,0 +1,19 @@
+{
+  "name": "wallet-service",
+  "version": "1.0.0",
+  "description": "Wallet Service for E-Wallet Microservices",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "axios": "^1.6.0",
+    "dotenv": "^16.0.3"
+  },
+  "author": "",
+  "license": "ISC"
+}

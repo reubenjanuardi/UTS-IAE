@@ -1,37 +1,34 @@
-# Transaction Service - E-Wallet System
+# Transaction Service
 
-Transaction Service untuk mengelola transaksi dalam sistem E-Wallet.
+Handles all transaction operations including transfers, top-ups, and withdrawals.
 
-## Setup
+## Endpoints
 
-```bash
-pip install -r requirements.txt
-```
-
-## Configuration
-
-Buat file `.env` dengan konfigurasi:
-
-```env
-PORT=3003
-SECRET_KEY=transaction-service-secret-key
-DATABASE_URL=sqlite:///transactions.db
-SERVICE_NAME=transaction-service
-WALLET_SERVICE_URL=http://localhost:3002
-NOTIFICATION_SERVICE_URL=http://localhost:3004
-```
-
-## Menjalankan
-
-```bash
-python app.py
-```
-
-## API Endpoints
-
-### Transactions
-
+- `GET /health` - Health check
 - `GET /transactions` - Get all transactions
-- `GET /transactions/{id}` - Get transaction by ID
-- `POST /transactions` - Create new transaction
-- `GET /transactions/user/{user_id}` - Get transactions for user
+- `GET /transactions/:id` - Get transaction by ID
+- `GET /transactions/user/:userId` - Get user transactions
+- `POST /transactions/send` - Send money between users
+- `POST /transactions/topup` - Top-up wallet
+- `POST /transactions/withdraw` - Withdraw from wallet
+
+## Database
+
+SQLite with `transactions` table containing:
+- id (INTEGER PRIMARY KEY)
+- user_id (INTEGER)
+- type (TEXT: send, topup, withdraw)
+- amount (REAL)
+- recipient_id (INTEGER)
+- status (TEXT: completed, pending)
+- created_at (DATETIME)
+
+## Integrations
+
+- Calls user-service to verify users
+- Calls wallet-service to update balances
+- Calls notification-service to send notifications
+
+## Port
+
+Runs on port 3003

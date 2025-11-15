@@ -1,42 +1,28 @@
-# Wallet Service - E-Wallet System
+# Wallet Service
 
-Wallet Service untuk mengelola dompet digital pengguna dalam sistem E-Wallet.
+Manages wallet balances and top-up/withdraw operations.
 
-## Setup
+## Endpoints
 
-```bash
-pip install -r requirements.txt
-```
+- `GET /health` - Health check
+- `GET /wallets/:userId` - Get wallet by user ID
+- `POST /wallets/topup` - Top-up wallet
+- `POST /wallets/withdraw` - Withdraw from wallet
+- `PUT /internal/wallets/:userId/balance` - Internal endpoint for updating balance
 
-## Configuration
+## Database
 
-Buat file `.env` dengan konfigurasi:
+SQLite with `wallets` table containing:
+- id (INTEGER PRIMARY KEY)
+- user_id (INTEGER UNIQUE)
+- balance (REAL)
+- updated_at (DATETIME)
 
-```env
-PORT=3002
-SECRET_KEY=wallet-service-secret-key
-DATABASE_URL=sqlite:///wallets.db
-SERVICE_NAME=wallet-service
-USER_SERVICE_URL=http://localhost:3001
-```
+## Integrations
 
-## Menjalankan
+- Validates user existence via user-service
+- Called by transaction-service for balance updates
 
-```bash
-python app.py
-```
+## Port
 
-## API Endpoints
-
-### Wallets
-
-- `GET /wallets` - Get all wallets
-- `GET /wallets/{id}` - Get wallet by ID
-- `POST /wallets` - Create new wallet
-- `PUT /wallets/{id}` - Update wallet
-- `GET /wallets/user/{user_id}` - Get wallet by user ID
-
-### Internal Endpoints
-
-- `GET /internal/wallets/user/{user_id}/balance` - Get wallet balance
-- `PUT /internal/wallets/user/{user_id}/balance` - Update wallet balance
+Runs on port 3002

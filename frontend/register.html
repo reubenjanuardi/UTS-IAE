@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Wallet - Login</title>
+    <title>E-Wallet - Register</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <div class="login-card">
-            <h1>E-Wallet</h1>
-            <p class="subtitle">Microservices Architecture</p>
+            <h1>Create Account</h1>
+            <p class="subtitle">E-Wallet Registration</p>
             
-            <form id="loginForm">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" placeholder="Enter your full name" required>
+                </div>
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" placeholder="Enter your email" required>
@@ -21,49 +25,45 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary">Register</button>
             </form>
 
             <p style="margin-top: 20px; text-align: center;">
-                Don't have an account? <a href="register.html">Register here</a>
+                Already have an account? <a href="index.html">Login here</a>
             </p>
 
             <div id="message" class="message"></div>
         </div>
     </div>
 
-    <script src="js/api.js"></script>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        const API_BASE_URL = 'http://localhost:3000/api';
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
+
             try {
-                showMessage('Logging in...', 'info');
-                const response = await fetch(`${API_BASE_URL}/user-service/users/login`, {
+                showMessage('Creating account...', 'info');
+
+                // Call registration endpoint directly without JWT token (not authenticated yet)
+                const response = await fetch(`${API_BASE_URL}/user-service/users`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok && data.success) {
-                    // Store token and user info
-                    localStorage.setItem('token', data.data.token);
-                    localStorage.setItem('userId', data.data.userId);
-                    localStorage.setItem('userName', data.data.name);
-                    localStorage.setItem('userEmail', data.data.email);
-                    
-                    showMessage('Login successful! Redirecting...', 'success');
+                    showMessage('Registration successful! Redirecting to login...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'wallet.html';
-                    }, 1500);
+                        window.location.href = 'index.html'; // Arahkan ke login setelah berhasil
+                    }, 2000);
                 } else {
-                    showMessage(data.message || 'Invalid email or password', 'error');
+                    showMessage(data.message || 'Registration failed. Please try again.', 'error');
                 }
             } catch (error) {
                 showMessage('Failed to connect to server: ' + error.message, 'error');

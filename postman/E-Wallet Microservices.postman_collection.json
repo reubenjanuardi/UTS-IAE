@@ -1,0 +1,870 @@
+{
+	"info": {
+		"_postman_id": "9ff3c384-c3af-42b8-ae73-d6f41da8c53d",
+		"name": "E-Wallet Microservices",
+		"description": "Complete API collection for E-Wallet Microservices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44668847",
+		"_collection_link": "https://reuben-2925570.postman.co/workspace/Reuben's-Workspace~3e964770-1225-4fb8-83c5-1ccfab9fcdcd/collection/44668847-9ff3c384-c3af-42b8-ae73-d6f41da8c53d?action=share&source=collection_link&creator=44668847"
+	},
+	"item": [
+		{
+			"name": "Authentication (Public - User Service)",
+			"item": [
+				{
+					"name": "Register New User (Alice)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{test_user_name}}\",\n  \"email\": \"{{test_user_email}}\",\n  \"password\": \"{{test_user_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register New User (Bob)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{second_user_name}}\",\n  \"email\": \"{{second_user_email}}\",\n  \"password\": \"{{second_user_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login (Alice)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.token) {",
+									"        pm.environment.set(\"jwt_token\", jsonData.data.token);",
+									"        pm.environment.set(\"user_id\", jsonData.data.userId);",
+									"        console.log(\"Alice JWT Token saved\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_user_email}}\",\n  \"password\": \"{{test_user_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users/login",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login (Bob)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.token) {",
+									"        pm.environment.set(\"jwt_token_user2\", jsonData.data.token);",
+									"        pm.environment.set(\"user_id_2\", jsonData.data.userId);",
+									"        console.log(\"Bob JWT Token saved\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{second_user_email}}\",\n  \"password\": \"{{second_user_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users/login",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users/1",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wallet Operations (Protected - Wallet Service)",
+			"item": [
+				{
+					"name": "Get Wallet (Alice)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/wallets",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"wallets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Wallet (Bob)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token_user2}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id_2}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/wallets",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"wallets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top-up Wallet (Alice)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": {{topup_amount}}\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/wallets/topup",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"wallets",
+								"topup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top-up Wallet (Bob)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token_user2}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id_2}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 500.00\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/wallets/topup",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"wallets",
+								"topup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw from Wallet (Alice)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100.00\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/wallets/withdraw",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"wallets",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions (Protected - Transaction Service)",
+			"item": [
+				{
+					"name": "Send Money (Alice to Bob)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"recipient_id\": {{user_id_2}},\n  \"amount\": {{transfer_amount}}\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/transaction-service/transactions/send",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"transaction-service",
+								"transactions",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Transactions (Alice)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/transaction-service/transactions/user",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"transaction-service",
+								"transactions",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Transactions (Bob)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token_user2}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id_2}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/transaction-service/transactions/user",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"transaction-service",
+								"transactions",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notifications (Protected - Notification Service)",
+			"item": [
+				{
+					"name": "Get Notifications (Alice)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/notification-service/notifications",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"notification-service",
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notifications (Bob)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token_user2}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id_2}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/notification-service/notifications",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"notification-service",
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Checks",
+			"item": [
+				{
+					"name": "Gateway Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/health",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Services Health Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/health/services",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"health",
+								"services"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/health",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wallet Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/health",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transaction Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/transaction-service/health",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"transaction-service",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Notification Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/notification-service/health",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"notification-service",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Error Testing",
+			"item": [
+				{
+					"name": "Invalid Credentials",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"WrongPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users/login",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing JWT Header",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/wallets",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"wallets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insufficient Balance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"recipient_id\": {{user_id_2}},\n  \"amount\": 5000.00\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/transaction-service/transactions/send",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"transaction-service",
+								"transactions",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Duplicate Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Alice Johnson\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing Required Fields (Register)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/user-service/users",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"user-service",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Amount (Zero)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 0\n}"
+						},
+						"url": {
+							"raw": "{{api_gateway_url}}/api/wallet-service/wallets/topup",
+							"host": [
+								"{{api_gateway_url}}"
+							],
+							"path": [
+								"api",
+								"wallet-service",
+								"wallets",
+								"topup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "api_gateway_url",
+			"value": "http://localhost:3000",
+			"type": "string",
+			"description": "API Gateway base URL"
+		}
+	]
+}
