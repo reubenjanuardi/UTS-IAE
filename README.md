@@ -914,4 +914,4 @@ CREATE TABLE notifications (
 - `ENVIRONMENT_SETUP.md` - Environment variables
 - `postman/README.md` - Postman collection
 - Service-specific `README.md` files
-- `start-all-services.bat` - Helper script untuk Windows
+- `START_ALL.bat` - Helper script untuk Windows
