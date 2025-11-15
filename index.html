@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Wallet Microservices - Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.3em;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .card-link {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .quick-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        .quick-start h2 {
+            margin-bottom: 16px;
+            font-size: 1.8em;
+        }
+
+        .quick-start ol {
+            margin-left: 20px;
+            line-height: 2;
+        }
+
+        .quick-start li {
+            margin-bottom: 10px;
+        }
+
+        .quick-start code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #667eea;
+        }
+
+        .service-card h4 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .service-card p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .port {
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .endpoint {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 4px 4px 4px 0;
+        }
+
+        .badge.success {
+            background: #28a745;
+        }
+
+        .badge.info {
+            background: #17a2b8;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏛️ E-Wallet Microservices</h1>
+        <p>Complete Microservices Architecture for Digital Wallet Management</p>
+    </header>
+
+    <div class="container">
+        <!-- Quick Start Section -->
+        <div class="quick-start">
+            <h2>🚀 Quick Start</h2>
+            <ol>
+                <li>Install dependencies: Run <code>setup.bat</code> (Windows) or <code>bash setup.sh</code> (Mac/Linux)</li>
+                <li>Configure environment: Copy <code>.env.example</code> to <code>.env.local</code></li>
+                <li>Start 5 services in separate terminals: <code>npm start</code> in each service or run the <code>START_ALL.bat</code> script</li> 
+                <li>Verify all services: <code>curl http://localhost:3000/health/services</code></li>
+                <li>Test with Postman: See <code>postman/README.md</code> for complete 11-step workflow</li>
+                <li>Access frontend: Open <code>frontend/index.html</code> in browser</li>
+            </ol>
+        </div>
+
+        <!-- Documentation Links -->
+        <div class="section">
+            <h2>📚 Documentation</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>📖 Main README</h3>
+                    <p>Complete architecture overview, deployment guide, and design patterns</p>
+                    <a href="README.md" class="card-link">Read Full Documentation →</a>
+                </div>
+                <div class="card">
+                    <h3>⚙️ Environment Setup</h3>
+                    <p>Environment variables configuration and deployment checklist</p>
+                    <a href="ENVIRONMENT_SETUP.md" class="card-link">View Setup Guide →</a>
+                </div>
+                <div class="card">
+                    <h3>🧪 Postman & Testing Guide</h3>
+                    <p>Complete API testing guide with 11-step workflow and error scenarios (corrected endpoints)</p>
+                    <a href="postman/README.md" class="card-link">View Postman Guide →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Overview -->
+        <div class="section">
+            <h2>🔧 Microservices</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <h4>User Service</h4>
+                    <p>User management & profile</p>
+                    <div class="port">:3001</div>
+                    <a href="user-service/README.md" style="text-decoration: none; color: #667eea; font-weight: 600;">View →</a>
+                </div>
+                <div class="service-card">
+                    <h4>Wallet Service</h4>
+                    <p>Balance & wallet management</p>
+                    <div class="port">:3002</div>
+                    <a href="wallet-service/README.md" style="text-decoration: none; color: #667eea; font-weight: 600;">View →</a>
+                </div>
+                <div class="service-card">
+                    <h4>Transaction Service</h4>
+                    <p>Send, top-up, withdraw</p>
+                    <div class="port">:3003</div>
+                    <a href="transaction-service/README.md" style="text-decoration: none; color: #667eea; font-weight: 600;">View →</a>
+                </div>
+                <div class="service-card">
+                    <h4>Notification Service</h4>
+                    <p>Transaction notifications</p>
+                    <div class="port">:3004</div>
+                    <a href="notification-service/README.md" style="text-decoration: none; color: #667eea; font-weight: 600;">View →</a>
+                </div>
+                <div class="service-card" style="grid-column: span 2; border-top-color: #28a745;">
+                    <h4>API Gateway</h4>
+                    <p>Central routing & service discovery</p>
+                    <div class="port">:3000</div>
+                    <a href="api-gateway/README.md" style="text-decoration: none; color: #667eea; font-weight: 600;">View →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <h2>✨ Key Features</h2>
+            <ul class="feature-list">
+                <li>5 independent microservices with clear separation of concerns</li>
+                <li>API Gateway for centralized request routing and service discovery</li>
+                <li>Inter-service communication via HTTP REST APIs</li>
+                <li>SQLite database for each service (independent data stores)</li>
+                <li>Health check endpoints in all services</li>
+                <li>Comprehensive error handling with standard JSON responses</li>
+                <li>Beautiful responsive frontend dashboard</li>
+                <li>Complete Postman collection for API testing</li>
+                <li>Docker support with docker-compose</li>
+                <li>Real-time notifications</li>
+            </ul>
+        </div>
+
+        <!-- Core Endpoints -->
+        <div class="section">
+            <h2>🔌 API Gateway Endpoints (Corrected)</h2>
+            <p style="color: #666; margin-bottom: 20px;">All endpoints are routed through API Gateway on port 3000 using pattern: <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">/api/service-name/endpoint</code></p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div>
+                    <h4>User Service (/api/user-service)</h4>
+                    <div class="endpoint">POST /users → Register</div>
+                    <div class="endpoint">POST /users/login → Login</div>
+                    <div class="endpoint">GET /users → List all</div>
+                    <div class="endpoint">GET /users/:id → Get by ID</div>
+                    <div class="endpoint">GET /health → Service health</div>
+                </div>
+                <div>
+                    <h4>Wallet Service (/api/wallet-service)</h4>
+                    <div class="endpoint">GET /wallets → Get wallet</div>
+                    <div class="endpoint">POST /wallets/topup → Add funds</div>
+                    <div class="endpoint">POST /wallets/withdraw → Withdraw</div>
+                    <div class="endpoint">GET /health → Service health</div>
+                </div>
+                <div>
+                    <h4>Transaction Service (/api/transaction-service)</h4>
+                    <div class="endpoint">POST /transactions/send → Send money</div>
+                    <div class="endpoint">GET /transactions/user → User history</div>
+                    <div class="endpoint">GET /transactions → All transactions</div>
+                    <div class="endpoint">GET /health → Service health</div>
+                </div>
+                <div>
+                    <h4>Notification Service (/api/notification-service)</h4>
+                    <div class="endpoint">GET /notifications → Get user notifs</div>
+                    <div class="endpoint">GET /notifications/all → All notifs</div>
+                    <div class="endpoint">GET /health → Service health</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Structure -->
+        <div class="section">
+            <h2>📁 Project Structure</h2>
+            <pre style="background: #f5f5f5; padding: 20px; border-radius: 8px; overflow-x: auto;"><code>e-wallet-app/
+├── api-gateway/           # Central routing (Port 3000)
+├── user-service/          # User management (Port 3001)
+├── wallet-service/        # Wallet management (Port 3002)
+├── transaction-service/   # Transactions (Port 3003)
+├── notification-service/  # Notifications (Port 3004)
+├── frontend/              # HTML + JS Dashboard
+├── postman/               # Postman Collection & Environment
+├── docker-compose.yml     # Docker orchestration
+├── setup.sh              # Setup script (Mac/Linux)
+├── setup.bat             # Setup script (Windows)
+├── README.md             # Full documentation
+├── QUICK_START.md        # Quick start guide
+└── index.html            # This documentation
+</code></pre>
+        </div>
+
+        <!-- Technology Stack -->
+        <div class="section">
+            <h2>🛠️ Technology Stack</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <div style="background: white; padding: 16px; border-radius: 8px;">
+                    <strong>Runtime</strong>
+                    <p>Node.js 18+</p>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 8px;">
+                    <strong>Framework</strong>
+                    <p>Express.js</p>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 8px;">
+                    <strong>Database</strong>
+                    <p>SQLite3</p>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 8px;">
+                    <strong>API Documentation</strong>
+                    <p>Postman Collection</p>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 8px;">
+                    <strong>Frontend</strong>
+                    <p>HTML5 + Vanilla JS</p>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 8px;">
+                    <strong>Containerization</strong>
+                    <p>Docker & docker-compose</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="section">
+            <h2>✅ Current Status & Features</h2>
+            <p style="margin-bottom: 20px;">
+                <span class="badge success">✓ JWT Authentication (1h expiry)</span>
+                <span class="badge success">✓ Bcrypt Password Hashing</span>
+                <span class="badge success">✓ Environment Variables (.env)</span>
+                <span class="badge success">✓ API Gateway Routing</span>
+                <span class="badge success">✓ 5 Microservices</span>
+                <span class="badge success">✓ SQLite WAL Mode</span>
+                <span class="badge success">✓ Health Check Endpoints</span>
+                <span class="badge success">✓ CORS Support</span>
+                <span class="badge success">✓ Error Handling</span>
+                <span class="badge success">✓ Comprehensive Testing</span>
+            </p>
+            <div style="background: #f0f8ff; border-left: 4px solid #17a2b8; padding: 16px; border-radius: 4px;">
+                <strong>📌 Latest Updates:</strong>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li>✅ All endpoints synchronized with API Gateway routing</li>
+                    <li>✅ Postman collection corrected with proper endpoint paths</li>
+                    <li>✅ Environment configuration consolidated in ENVIRONMENT_SETUP.md</li>
+                    <li>✅ Complete 11-step testing workflow documented</li>
+                    <li>✅ Error scenarios and troubleshooting guide included</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Getting Started Commands -->
+        <div class="section">
+            <h2>⌨️ Quick Commands</h2>
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px;">
+                <h4>Install Dependencies</h4>
+                <code style="background: white; padding: 10px; border-left: 4px solid #667eea; display: block; margin-bottom: 20px;">
+                    Windows: setup.bat<br>
+                    Mac/Linux: bash setup.sh
+                </code>
+
+                <h4>Start Services</h4>
+                <code style="background: white; padding: 10px; border-left: 4px solid #667eea; display: block; margin-bottom: 20px;">
+                    Terminal 1: cd api-gateway && npm start<br>
+                    Terminal 2: cd user-service && npm startv<br>
+                    Terminal 3: cd wallet-service && npm start<br>
+                    Terminal 4: cd transaction-service && npm start<br>
+                    Terminal 5: cd notification-service && npm start
+                </code>
+
+                <h4>Verify Services</h4>
+                <code style="background: white; padding: 10px; border-left: 4px solid #667eea; display: block;">
+                    curl http://localhost:3000/health/services
+                </code>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>E-Wallet Microservices Architecture | UTS IAE Coursework | November 2025</p>
+    </footer>
+</body>
+</html>
